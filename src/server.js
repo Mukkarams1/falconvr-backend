@@ -46,19 +46,44 @@ const app = express();
 //  express.json()   — parses incoming JSON request bodies so
 //                     we can read req.body in our routes.
 //
-// CORS — allow local dev + the deployed Vercel dashboard URL.
-// VITE_DASHBOARD_URL is set in Railway environment variables
-// after you deploy the dashboard to Vercel.
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  process.env.DASHBOARD_URL, // e.g. https://falconvr-dashboard.vercel.app
-].filter(Boolean); // removes undefined if env var not set yet
+// ── CORS Configuration ───────────────────────────────────────
+//
+//  We use a function-based origin check instead of a static
+//  array for two reasons:
+//
+//  1. Trailing slash mismatch — browsers send the origin as
+//     "https://example.vercel.app" but env vars sometimes have
+//     a trailing slash "https://example.vercel.app/" — we strip
+//     it before comparing.
+//
+//  2. Vercel preview URLs — every Vercel deployment gets a unique
+//     preview URL like "falconvr-dashboard-abc123.vercel.app".
+//     We allow ALL subdomains of vercel.app that contain the
+//     project name so previews work too.
+//
+const DASHBOARD_URL = (process.env.DASHBOARD_URL || '').replace(/\/$/, ''); // strip trailing slash
 
-app.use(cors({
-  origin: allowedOrigins,
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (Postman, Unity, server-to-server)
+    if (!origin) return callback(null, true);
+
+    const cleanOrigin = origin.replace(/\/$/, '');
+
+    const isLocalhost = cleanOrigin.startsWith('http://localhost');
+    const isVercelPreview = cleanOrigin.includes('vercel.app') && cleanOrigin.includes('falconvr');
+    const isDashboard = DASHBOARD_URL && cleanOrigin === DASHBOARD_URL;
+
+    if (isLocalhost || isVercelPreview || isDashboard) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS: Origin ${origin} not allowed`));
+    }
+  },
   credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // ── API Routes ───────────────────────────────────────────────
