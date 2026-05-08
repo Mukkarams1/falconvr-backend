@@ -10,11 +10,13 @@
 //    name        — e.g. "Mathematics", "Science", "History"
 //    description — short text shown to the student in VR
 //    icon        — emoji or icon identifier for UI (e.g. "📐")
+//    environment — VR scene to load for this subject (see config/environments.js)
 //    createdBy   — reference to the Teacher who created it
 //    isActive    — if false, hidden from students in VR
 // ============================================================
 
 const mongoose = require('mongoose');
+const { ENVIRONMENTS } = require('../config/environments');
 
 const subjectSchema = new mongoose.Schema(
   {
@@ -22,7 +24,8 @@ const subjectSchema = new mongoose.Schema(
       type:     String,
       required: [true, 'Subject name is required'],
       trim:     true,
-      unique:   true,
+      // No unique index here — uniqueness among active subjects is enforced
+      // in the controller so that deactivated names can be reused.
     },
     description: {
       type:    String,
@@ -32,6 +35,11 @@ const subjectSchema = new mongoose.Schema(
     icon: {
       type:    String,
       default: '📚',
+    },
+    environment: {
+      type:     String,
+      enum:     { values: ENVIRONMENTS, message: 'Invalid environment: {VALUE}' },
+      required: [true, 'Environment is required'],
     },
     createdBy: {
       // This stores a reference to a Teacher document's _id.

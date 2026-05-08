@@ -36,24 +36,28 @@ const getSubjects = async (req, res) => {
 // ── POST create subject ──────────────────────────────────────
 const createSubject = async (req, res) => {
   try {
-    const { name, description, icon } = req.body;
+    const { name, description, icon, environment } = req.body;
 
-    const subject = await Subject.create({
-      name,
-      description,
-      icon,
-      createdBy: req.teacher._id, // from protect middleware
-    });
-
-    res.status(201).json({ success: true, subject });
-  } catch (error) {
-    // Handle duplicate subject name
-    if (error.code === 11000) {
+    // Only block if an *active* subject with this name already exists.
+    // Deactivated subjects don't count, so their names can be reused.
+    const duplicate = await Subject.findOne({ name: name?.trim(), isActive: true });
+    if (duplicate) {
       return res.status(400).json({
         success: false,
         message: 'A subject with this name already exists',
       });
     }
+
+    const subject = await Subject.create({
+      name,
+      description,
+      icon,
+      environment,
+      createdBy: req.teacher._id,
+    });
+
+    res.status(201).json({ success: true, subject });
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

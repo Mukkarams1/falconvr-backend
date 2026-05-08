@@ -21,11 +21,12 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 
 // ── Import route files ───────────────────────────────────────
-const authRoutes     = require('./routes/auth.routes');
-const subjectRoutes  = require('./routes/subject.routes');
-const lessonRoutes   = require('./routes/lesson.routes');
-const quizRoutes     = require('./routes/quiz.routes');
-const resultRoutes   = require('./routes/result.routes');
+const authRoutes         = require('./routes/auth.routes');
+const subjectRoutes      = require('./routes/subject.routes');
+const lessonRoutes       = require('./routes/lesson.routes');
+const quizRoutes         = require('./routes/quiz.routes');
+const resultRoutes       = require('./routes/result.routes');
+const environmentRoutes  = require('./routes/environments.routes');
 
 // ── Connect to database ──────────────────────────────────────
 connectDB();
@@ -92,11 +93,12 @@ app.use(express.json());
 //  so if you ever change the API, you can make /api/v2 without
 //  breaking old clients (like the Unity VR app).
 //
-app.use('/api/v1/auth',     authRoutes);
-app.use('/api/v1/subjects', subjectRoutes);
-app.use('/api/v1/lessons',  lessonRoutes);
-app.use('/api/v1/quizzes',  quizRoutes);
-app.use('/api/v1/results',  resultRoutes);
+app.use('/api/v1/auth',         authRoutes);
+app.use('/api/v1/subjects',     subjectRoutes);
+app.use('/api/v1/lessons',      lessonRoutes);
+app.use('/api/v1/quizzes',      quizRoutes);
+app.use('/api/v1/results',      resultRoutes);
+app.use('/api/v1/environments', environmentRoutes);
 
 // ── Health check route ───────────────────────────────────────
 //  A simple GET / that returns 200 OK — useful to confirm the

@@ -23,9 +23,13 @@
 //    questionText   → the question string
 //    options        → array of exactly 4 strings [A, B, C, D]
 //    correctIndex   → 0, 1, 2, or 3 (index into options[])
+//    environment    → optional override; if set, the VR app loads this
+//                     environment for this question instead of the
+//                     subject-level environment (see config/environments.js)
 // ============================================================
 
 const mongoose = require('mongoose');
+const { ENVIRONMENTS } = require('../config/environments');
 
 // ── Sub-schema for a single question ────────────────────────
 const questionSchema = new mongoose.Schema(
@@ -50,6 +54,13 @@ const questionSchema = new mongoose.Schema(
       required: [true, 'Correct answer index is required'],
       min:      0,
       max:      3,
+    },
+    environment: {
+      // Optional per-question override. When empty/absent the VR app
+      // falls back to the parent subject's environment.
+      type:    String,
+      enum:    { values: ['', ...ENVIRONMENTS], message: 'Invalid environment: {VALUE}' },
+      default: '',
     },
   },
   { _id: true } // Each question gets its own _id (useful for result tracking)
