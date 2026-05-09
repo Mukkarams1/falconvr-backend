@@ -127,4 +127,4 @@ const deleteSubject = async (req, res) => {
   }
 };
 
-module.exports = { getSubjects, createSubject, getSubject, updateSubject, deleteSubject };
+module.exports = { getSubjects, createSubject, getSubject, getSubjectEnvironment, updateSubject, deleteSubject };
