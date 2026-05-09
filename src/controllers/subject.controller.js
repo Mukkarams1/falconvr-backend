@@ -75,6 +75,22 @@ const getSubject = async (req, res) => {
   }
 };
 
+// ── GET subject environment (lightweight — Unity convenience) ─
+//  Returns only the environment identifier for a given subject.
+//  Useful when Unity needs to know which scene to load immediately
+//  after the student selects a subject, before the full quiz loads.
+const getSubjectEnvironment = async (req, res) => {
+  try {
+    const subject = await Subject.findById(req.params.id, 'environment name');
+    if (!subject) {
+      return res.status(404).json({ success: false, message: 'Subject not found' });
+    }
+    res.status(200).json({ success: true, environment: subject.environment, subject: subject.name });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // ── PUT update subject ───────────────────────────────────────
 const updateSubject = async (req, res) => {
   try {

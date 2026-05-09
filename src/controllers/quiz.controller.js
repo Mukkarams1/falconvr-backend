@@ -30,7 +30,7 @@ const Quiz = require('../models/Quiz.model');
 const getQuizzes = async (req, res) => {
   try {
     const quizzes = await Quiz.find()
-      .populate('subject', 'name icon')
+      .populate('subject', 'name icon environment')
       .populate('createdBy', 'name')
       .sort({ createdAt: -1 });
     res.status(200).json({ success: true, count: quizzes.length, quizzes });
@@ -43,7 +43,7 @@ const getQuizzes = async (req, res) => {
 const getQuizBySubject = async (req, res) => {
   try {
     const quiz = await Quiz.findOne({ subject: req.params.subjectId })
-      .populate('subject', 'name icon');
+      .populate('subject', 'name icon environment');
     if (!quiz) {
       return res.status(404).json({ success: false, message: 'No quiz found for this subject' });
     }

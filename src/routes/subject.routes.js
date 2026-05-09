@@ -6,18 +6,19 @@
 const express = require('express');
 const {
   getSubjects, createSubject, getSubject,
-  updateSubject, deleteSubject,
+  getSubjectEnvironment, updateSubject, deleteSubject,
 } = require('../controllers/subject.controller');
 const { protect } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
-// GET all / POST new — both need protect so only teachers can write
-// GET all is also used by VR app — for VR, remove protect from GET if needed
 router
   .route('/')
-  .get(getSubjects)          // VR app + dashboard can read without auth
-  .post(protect, createSubject); // only teachers can create
+  .get(getSubjects)
+  .post(protect, createSubject);
+
+// Must be declared before /:id so Express doesn't treat "environment" as an id
+router.get('/:id/environment', getSubjectEnvironment);
 
 router
   .route('/:id')
